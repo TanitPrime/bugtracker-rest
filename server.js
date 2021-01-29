@@ -1,8 +1,8 @@
-const express = require("express");
 const mongoose = require("mongoose");
-const animal = require("./Schema");
+require("dotenv").config();
+const express = require("express");
 const app = express();
-const bodyParser = require('body-parser')
+const ProjectRoutes = require("./Routes/ProjectRoutes");
 
 mongoose.connect("mongodb://localhost/mern", {
   useNewUrlParser: true,
@@ -10,35 +10,19 @@ mongoose.connect("mongodb://localhost/mern", {
 });
 const db = mongoose.connection;
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/project", ProjectRoutes);
 
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
+
   console.log("db connected");
+
   app.get("/", (req, res) => {
-    res.send("get to homepage recieved");
+    res.send("welcome to homepage");
   });
 
-  app.post("/animal", async (req, res) => {
-      console.log(req.body.name)
-    const pet = new animal({ name: req.body.name });
-    await pet.save(err=>{
-        if(err) res.send("error when saving animal")
-        res.send("animal registered")
-    })
-  });
-
-  app.get("/animals", (req, res) => {
-      animal.find()
-        .then(data=>{
-            res.json(data);
-        })
-        .catch(err=>{
-            res.json(err)
-        })
-  });
-
-  app.listen({ port: 4000 }, () => {
-    console.log("server up at 4000");
+  app.listen(process.env.PORT, () => {
+    console.log(`server listening on ${process.env.PORT}`);
   });
 });
