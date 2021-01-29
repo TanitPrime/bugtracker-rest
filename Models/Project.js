@@ -5,10 +5,12 @@ const schema = new mongoose.Schema({
     min: 6,
     required: true,
     type: String,
+    unique: true,
   },
   status: {
-    enum: ["todo", "done", "in-progress"],
+    enum: ["todo", "done", "doing"],
     type: String,
+    default: "todo",
   },
   dateStarted: {
     type: Date,
