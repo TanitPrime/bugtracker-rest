@@ -1,0 +1,7 @@
+//first you make a db connection like so
+mongoose.connect('mongodb://localhost/test',{newirlpareser....})
+
+//then to check if the db connected and to use mongoose you make a db const
+const db = mongoose.connection;
+//then 
+db.once('open',functionthatdoesyourshit());
