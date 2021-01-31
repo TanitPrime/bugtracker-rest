@@ -42,7 +42,6 @@ router.post("/", async (req, res) => {
 });
 
 //delete one
-
 router.get("/delete/:id", async (req, response) => {
   await Project.findByIdAndDelete(req.params.id,(err,res)=>{
     if(err){
@@ -51,5 +50,16 @@ router.get("/delete/:id", async (req, response) => {
     return response.send("document deleted").status(200)
   })
 });
+
+//update
+router.put("/put/:id", async (req, response) => {
+  await Project.findByIdAndUpdate(req.params.id,{name : req.body.name , status : req.body.status},(err,res)=>{
+    if(err){
+      return response.send(err).status(404)
+    }
+    return response.send("document updated").status(200)
+  })
+});
+
 
 module.exports = router;

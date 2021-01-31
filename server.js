@@ -10,6 +10,7 @@ mongoose.connect("mongodb://localhost/mern", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
+  useFindAndModify : false
 });
 const db = mongoose.connection;
 
