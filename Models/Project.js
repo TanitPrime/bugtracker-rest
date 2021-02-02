@@ -16,6 +16,12 @@ const schema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  features : [
+    {
+      type : mongoose.Schema.Types.ObjectId,
+      ref: "Feature"
+    }
+  ]
 });
 const Project = mongoose.model("Project", schema);
 
