@@ -1,13 +1,14 @@
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$todo$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const express = require("express");
 const router = express.Router();
-const Project = require("../Models/Feature");
+const Feature = require("../Models/Feature");
+const Project = require("../Models/Project");
 
 //Project Routes
 //get all
-router.get("/projects", async (req, res) => {
+router.get("/features", async (req, res) => {
   try {
-    await Project.find().then((data) => {
+    await Feature.find().then((data) => {
       return res.status(200).send(data);
     });
   } catch (err) {
@@ -18,47 +19,64 @@ router.get("/projects", async (req, res) => {
 
 //get one
 router.get("/:id", async (req, response) => {
-    await Project.findById(req.params.id,(err,res)=>{
-      if(err || !res){
-        return response.send("no data found"+err).status(404)
-      }
-      return response.send(res).status(200)
-    })
+  await Feature.findById(req.params.id, (err, res) => {
+    if (err || !res) {
+      return response.send("no data found" + err).status(404);
+    }
+    return response.send(res).status(200);
+  });
 });
 
 //create
 router.post("/", async (req, res) => {
-  console.log(req.body);
-  const newproject = new Project({
+  const feature = {
     name: req.body.name,
+    priority: req.body.priority,
     status: req.body.status,
+  };
+  const newfeature = new Feature(feature);
+  await newfeature.save((err, result) => {
+    if (err) {
+      return res.status(400).send(err);
+    }
+    Project.findByIdAndUpdate(
+      req.projectId,
+      { $push: { features: result._id } },
+      { new: true, useFindAndModify: false },
+      (err,success)=>{
+        if(err) res.status(400).send(err)
+        return res.status(200).send(success)
+      }
+    );
   });
-
-  await newproject.save((err) => {
-    return res.send("bad request or invalid data \n" + err);
-  });
-  return res.send("project saved");
 });
 
 //delete one
 router.get("/delete/:id", async (req, response) => {
-  await Project.findByIdAndDelete(req.params.id,(err,res)=>{
-    if(err){
-      return response.send(err).status(404)
+  await Project.findByIdAndDelete(req.params.id, (err, res) => {
+    if (err) {
+      return response.send(err).status(404);
     }
-    return response.send("document deleted").status(200)
-  })
+    return response.send("document deleted").status(200);
+  });
 });
 
 //update
 router.put("/put/:id", async (req, response) => {
-  await Project.findByIdAndUpdate(req.params.id,{name : req.body.name , status : req.body.status},(err,res)=>{
-    if(err){
-      return response.send(err).status(404)
+  await Feature.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name,
+      priority: req.body.priority,
+      status: req.body.status,
+    },
+    (err, res) => {
+      if (err) {
+        return response.send(err).status(404);
+      }
+      return response.send("document updated").status(200);
     }
-    return response.send("document updated").status(200)
-  })
+  );
 });
-
 
 module.exports = router;

@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const ProjectRoutes = require("./Routes/ProjectRoutes");
+const FeatureRoutes = require("./Routes/FeatureRoutes");
 const bodyParser = require("body-parser");
 
 //DB instance
@@ -10,7 +11,7 @@ mongoose.connect("mongodb://localhost/mern", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
-  useFindAndModify : false
+  useFindAndModify: false,
 });
 const db = mongoose.connection;
 
@@ -18,6 +19,14 @@ const db = mongoose.connection;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/project", ProjectRoutes);
+app.use(
+  "/project/:id/feature/",
+  (req, res, next) => {
+    req.projectId = req.params.id;
+    next();
+  },
+  FeatureRoutes
+);
 
 app.get("/", (req, res) => {
   res.send("welcome to homepage");

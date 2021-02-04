@@ -7,22 +7,22 @@ const Project = require("../Models/Project");
 router.get("/projects", async (req, res) => {
   try {
     await Project.find().then((data) => {
-      return res.status(200).send(data);
+      return res.send(200, data);
     });
   } catch (err) {
     console.log(err);
-    return res.status(404).send("no data or bad request \n" + err);
+    return res.send(404, "no data or bad request \n" + err);
   }
 });
 
 //get one
 router.get("/:id", async (req, response) => {
-    await Project.findById(req.params.id,(err,res)=>{
-      if(err || !res){
-        return response.send("no data found"+err).status(404)
-      }
-      return response.send(res).status(200)
-    })
+  await Project.findById(req.params.id, (err, res) => {
+    if (err || !res) {
+      return response.send(404, "no data found" + err);
+    }
+    return response.send(200, res);
+  });
 });
 
 //create
@@ -34,30 +34,33 @@ router.post("/", async (req, res) => {
   });
 
   await newproject.save((err) => {
-    return res.send("bad request or invalid data \n" + err);
+    return res.send(400, "bad request or invalid data \n" + err);
   });
-  return res.send("project saved");
+  return res.send(200, "project saved");
 });
 
 //delete one
-router.get("/delete/:id", async (req, response) => {
-  await Project.findByIdAndDelete(req.params.id,(err,res)=>{
-    if(err){
-      return response.send(err).status(404)
+router.get("/:id", async (req, response) => {
+  await Project.findByIdAndDelete(req.params.id, (err, res) => {
+    if (err) {
+      return response.send(404, err);
     }
-    return response.send("document deleted").status(200)
-  })
+    return response.send(200, "document deleted");
+  });
 });
 
 //update
 router.put("/put/:id", async (req, response) => {
-  await Project.findByIdAndUpdate(req.params.id,{name : req.body.name , status : req.body.status},(err,res)=>{
-    if(err){
-      return response.send(err).status(404)
+  await Project.findByIdAndUpdate(
+    req.params.id,
+    { name: req.body.name, status: req.body.status },
+    (err, res) => {
+      if (err) {
+        return response.send(404, err);
+      }
+      return response.send(200, "document updated");
     }
-    return response.send("document updated").status(200)
-  })
+  );
 });
-
 
 module.exports = router;
