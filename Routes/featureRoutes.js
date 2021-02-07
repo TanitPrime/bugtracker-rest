@@ -43,26 +43,27 @@ router.post("/", async (req, res) => {
       req.projectId,
       { $push: { features: result._id } },
       { new: true, useFindAndModify: false },
-      (err,success)=>{
-        if(err) res.status(400).send(err)
-        return res.status(200).send(success)
+      (err, success) => {
+        if (err) res.status(400).send(err);
+        return res.status(200).send(success);
       }
     );
   });
 });
 
 //delete one
-router.get("/delete/:id", async (req, response) => {
-  await Project.findByIdAndDelete(req.params.id, (err, res) => {
+router.delete("/:id", async (req, response) => {
+  console.log(req.params.id)
+  await Feature.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
       return response.send(err).status(404);
     }
-    return response.send("document deleted").status(200);
+    return response.send("document deleted"+res).status(200);
   });
 });
 
 //update
-router.put("/put/:id", async (req, response) => {
+router.put("/:id", async (req, response) => {
   await Feature.findByIdAndUpdate(
     req.params.id,
     {
@@ -78,5 +79,6 @@ router.put("/put/:id", async (req, response) => {
     }
   );
 });
+
 
 module.exports = router;

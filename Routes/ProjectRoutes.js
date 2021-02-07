@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
 });
 
 //delete one
-router.get("/:id", async (req, response) => {
+router.delete("/:id", async (req, response) => {
   await Project.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
       return response.send(404, err);
@@ -50,7 +50,7 @@ router.get("/:id", async (req, response) => {
 });
 
 //update
-router.put("/put/:id", async (req, response) => {
+router.put("/:id", async (req, response) => {
   await Project.findByIdAndUpdate(
     req.params.id,
     { name: req.body.name, status: req.body.status },
