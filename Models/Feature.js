@@ -15,6 +15,12 @@ const schema = new mongoose.Schema({
     default: "todo",
     type: String,
   },
+  tasks: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+    },
+  ],
 });
 
 const Feature = mongoose.model("Feature", schema);

@@ -4,7 +4,7 @@ const Project = require("../Models/Project");
 
 //Project Routes
 //get all
-router.get("/projects", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     await Project.find().then((data) => {
       return res.send(200, data);

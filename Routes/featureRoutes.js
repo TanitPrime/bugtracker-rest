@@ -6,7 +6,7 @@ const Project = require("../Models/Project");
 
 //Project Routes
 //get all
-router.get("/features", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     await Feature.find().then((data) => {
       return res.status(200).send(data);
@@ -27,6 +27,8 @@ router.get("/:id", async (req, response) => {
   });
 });
 
+
+//#################################### test this ########################################
 //create
 router.post("/", async (req, res) => {
   const feature = {
@@ -39,26 +41,32 @@ router.post("/", async (req, res) => {
     if (err) {
       return res.status(400).send(err);
     }
-    Project.findByIdAndUpdate(
-      req.projectId,
-      { $push: { features: result._id } },
-      { new: true, useFindAndModify: false },
-      (err, success) => {
-        if (err) res.status(400).send(err);
-        return res.status(200).send(success);
-      }
-    );
+    // Project.findByIdAndUpdate(
+    //   req.projectId,
+    //   { $push: { features: result._id } },
+    //   { new: true, useFindAndModify: false },
+    //   (err, success) => {
+    //     if (err) res.status(400).send(err);
+    //     return res.status(200).send(success);
+    //   }
+    // );
+    Project.findById(req.body.projectId)
+      .populate("features")
+      .exec((err, result) => {
+        if (err) return res.send(err);
+        res.status(200).send(result);
+      });
   });
 });
 
 //delete one
 router.delete("/:id", async (req, response) => {
-  console.log(req.params.id)
+  console.log(req.params.id);
   await Feature.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
       return response.send(err).status(404);
     }
-    return response.send("document deleted"+res).status(200);
+    return response.send("document deleted" + res).status(200);
   });
 });
 
@@ -79,6 +87,5 @@ router.put("/:id", async (req, response) => {
     }
   );
 });
-
 
 module.exports = router;

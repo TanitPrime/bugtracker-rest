@@ -19,15 +19,9 @@ const db = mongoose.connection;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/project", ProjectRoutes);
-app.use(
-  "/project/:id/feature/",
-  (req, res, next) => {
-    req.projectId = req.params.id;
-    next();
-  },
-  FeatureRoutes
-);
+app.use("/feature/",FeatureRoutes);
 
+//homepage
 app.get("/", (req, res) => {
   res.send("welcome to homepage");
 });
