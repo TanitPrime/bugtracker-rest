@@ -7,22 +7,23 @@ const Project = require("../Models/Project");
 router.get("/", async (req, res) => {
   try {
     await Project.find().then((data) => {
-      return res.send(200, data);
+      return res.send(data);
     });
   } catch (err) {
     console.log(err);
-    return res.send(404, "no data or bad request \n" + err);
+    return res.status(404).send("no data or bad request \n" + err);
   }
 });
 
 //get one
-router.get("/:id", async (req, response) => {
-  await Project.findById(req.params.id, (err, res) => {
-    if (err || !res) {
-      return response.send(404, "no data found" + err);
-    }
-    return response.send(200, res);
-  });
+router.get("/:id", async (req, res) => {
+  //populate features before sending for ease of access
+  Project.findById(req.params.id)
+    .populate("features")
+    .exec((err, result) => {
+      if (err) return res.status(404).send(err);
+      return res.status(200).send(result);
+    });
 });
 
 //create
@@ -34,9 +35,11 @@ router.post("/", async (req, res) => {
   });
 
   await newproject.save((err) => {
-    return res.send(400, "bad request or invalid data \n" + err);
+    if (err) {
+      return res.status(400).send("bad request or invalid data \n" + err);
+    }
   });
-  return res.send(200, "project saved");
+  return res.send("project saved");
 });
 
 //delete one

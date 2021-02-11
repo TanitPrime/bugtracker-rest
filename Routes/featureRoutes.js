@@ -1,4 +1,3 @@
-// $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$todo$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const express = require("express");
 const router = express.Router();
 const Feature = require("../Models/Feature");
@@ -27,36 +26,28 @@ router.get("/:id", async (req, response) => {
   });
 });
 
-
-//#################################### test this ########################################
 //create
-router.post("/", async (req, res) => {
+router.post("/", async (req, response) => {
   const feature = {
     name: req.body.name,
     priority: req.body.priority,
     status: req.body.status,
   };
   const newfeature = new Feature(feature);
+  // save feature
   await newfeature.save((err, result) => {
     if (err) {
       return res.status(400).send(err);
     }
-    // Project.findByIdAndUpdate(
-    //   req.projectId,
-    //   { $push: { features: result._id } },
-    //   { new: true, useFindAndModify: false },
-    //   (err, success) => {
-    //     if (err) res.status(400).send(err);
-    //     return res.status(200).send(success);
-    //   }
-    // );
-    Project.findById(req.body.projectId)
-      .populate("features")
-      .exec((err, result) => {
-        if (err) return res.send(err);
-        res.status(200).send(result);
-      });
+    //add reference in Project.features
+    Project.findByIdAndUpdate(req.body.projectId, {
+      $push :{features : result._id }
+    },(err,res)=>{
+      if(err) response.status(400).send(err)
+      return response.status(200).send(result)
+    });
   });
+
 });
 
 //delete one
@@ -87,5 +78,7 @@ router.put("/:id", async (req, response) => {
     }
   );
 });
+
+
 
 module.exports = router;
