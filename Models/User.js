@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validoator = require("validator")
 
 const schema = new mongoose.Schema({
   name: {
@@ -12,8 +13,11 @@ const schema = new mongoose.Schema({
   },
   email : {
     type: String,
-    trim:true,
-    lowercase:true,
+    validate:{
+      validator:validoator.IsEmail,
+      message: "not a valid email",
+      isAsync:false
+    },
     unique:true,
     required:true
   },
