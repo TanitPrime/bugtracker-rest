@@ -19,6 +19,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   //populate features before sending for ease of access
   Project.findById(req.params.id)
+    //fill feature reference with actual features
     .populate("features")
     .exec((err, result) => {
       if (err) return res.status(404).send(err);
@@ -28,7 +29,6 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  console.log(req.body);
   const newproject = new Project({
     name: req.body.name,
     status: req.body.status,
@@ -46,9 +46,9 @@ router.post("/", async (req, res) => {
 router.delete("/:id", async (req, response) => {
   await Project.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
-      return response.send(404, err);
+      return response.status(404).send(err);
     }
-    return response.send(200, "document deleted");
+    return response.status(200).send("document deleted");
   });
 });
 
@@ -59,9 +59,9 @@ router.put("/:id", async (req, response) => {
     { name: req.body.name, status: req.body.status },
     (err, res) => {
       if (err) {
-        return response.send(404, err);
+        return response.status(404).send(err);
       }
-      return response.send(200, "document updated");
+      return response.status(200).send("document updated");
     }
   );
 });

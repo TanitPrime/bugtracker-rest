@@ -1,13 +1,14 @@
+//£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££ TEST THIS ££££££££££££££££££££££££££££££££££££££££££££££££££££££
 const express = require("express");
 const router = express.Router();
 const Feature = require("../Models/Feature");
-const Project = require("../Models/Project");
+const Task = require("../Models/Task");
 
-//Feature Routes
+//Task Routes
 //get all
 router.get("/", async (req, res) => {
   try {
-    await Feature.find().then((data) => {
+    await Task.find().then((data) => {
       return res.status(200).send(data);
     });
   } catch (err) {
@@ -18,41 +19,34 @@ router.get("/", async (req, res) => {
 
 //get one
 router.get("/:id", async (req, response) => {
-  // await Feature.findById(req.params.id, (err, res) => {
-  //   if (err || !res) {
-  //     return response.status(404).send("no data found" + err);
-  //   }
-  //   return response.status(200).send(res);
-  // });
-  Feature.findById(req.params.id)
-  //fill tasks reference with actual tasks
-  .populate("tasks")
-  .exec((err, result) => {
-    if (err) return res.status(404).send(err);
-    return res.status(200).send(result);
+  await Task.findById(req.params.id, (err, res) => {
+    if (err || !res) {
+      return response.status(404).send("no data found" + err);
+    }
+    return response.status(200).send(res);
   });
 });
 
 //create
-//requires Project Id
+//requires Feature Id
 router.post("/", async (req, response) => {
-  //new feature from request
-  const feature = {
+  //new task from request
+  const task = {
     name: req.body.name,
-    priority: req.body.priority,
     status: req.body.status,
+    category: req.body.category,
   };
-  const newfeature = new Feature(feature);
-  // save feature
-  await newfeature.save((err, result) => {
+  const newtask = new Task(task);
+  // save task
+  await newtask.save((err, result) => {
     if (err) {
       return res.status(400).send(err);
     }
-    //add reference in Project.features
-    Project.findByIdAndUpdate(
-      req.body.projectId,
+    //add reference in Feature.tasks
+    Feature.findByIdAndUpdate(
+      req.body.featureId,
       {
-        $push: { features: result._id },
+        $push: { tasks: result._id },
       },
       (err, res) => {
         if (err) response.status(400).send(err);
@@ -64,7 +58,7 @@ router.post("/", async (req, response) => {
 
 //delete one
 router.delete("/:id", async (req, response) => {
-  await Feature.findByIdAndDelete(req.params.id, (err, res) => {
+  await Task.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
       return response.status(404).send(err);
     }
@@ -74,12 +68,12 @@ router.delete("/:id", async (req, response) => {
 
 //update
 router.put("/:id", async (req, response) => {
-  await Feature.findByIdAndUpdate(
+  await Task.findByIdAndUpdate(
     req.params.id,
     {
       name: req.body.name,
-      priority: req.body.priority,
       status: req.body.status,
+      category: req.body.category,
     },
     (err, res) => {
       if (err) {
