@@ -4,6 +4,7 @@ const schema = new mongoose.Schema({
   name: {
     type: String,
     min: 6,
+    required:true
   },
   priority: {
     type: Number,
@@ -20,7 +21,7 @@ const schema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Task",
     },
-  ],
+  ]
 });
 
 const Feature = mongoose.model("Feature", schema);
