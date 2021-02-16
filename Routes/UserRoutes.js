@@ -49,26 +49,22 @@ router.post("/", async (req, res) => {
   //check for validation
   const validation = schema.validate(user);
   if(validation.error){
-    return res.status(401).send(validation)
+    return res.status(401).send(validation.error.details[0].message)
   }
   const newUser = new User(user);
   //check if user exists 
-  await User.find()
-    .then(async (users)=>{
-      users.filter(user=>{
-        if(user.email == user.email){
-          const err = new Error("email already exists");
-          return res.status(401).send(err)
-        }
-      })
-      //if doesnt exist we save
-      await newUser.save((err) => {
-        if (err) {
-          return res.status(400).send(err);
-        }
-      });
-      return res.send("User saved");
-    })
+  const search= await User.findOne({email : user.email}).exec()
+  if(search){
+    return res.status(422).send("email already exists")
+  }
+  //if doesnt exist we save
+  await newUser.save((err) => {
+    if (err) {
+      return res.send(err);
+    }
+  });
+  return res.status(200).send("User saved");
+
 });
 
 //delete one
