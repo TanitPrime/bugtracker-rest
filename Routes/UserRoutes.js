@@ -2,8 +2,18 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
+const Joi = require("joi");
 
-//Project Routes
+//validation schema
+const schema = Joi.object({
+  name: Joi.string().min(6).required().error(()=>{return {message: "name required"}}),
+  email : Joi.string().min(6).required().email(),
+  password : Joi.string().min(8).required(),
+  role : Joi.string().valid("Dev","Tester","Manager","Admin")
+})
+
+
+//User Routes
 //get all
 router.get("/", async (req, res) => {
   try {
@@ -30,19 +40,35 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  const newUser = new User({
+  const user = {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password, // PLACEHOLDER !!!!!!!!
     role: req.body.role,
-  });
-
-  await newUser.save((err) => {
-    if (err) {
-      return res.status(400).send("bad request or invalid data \n" + err);
-    }
-  });
-  return res.send("User saved");
+  };
+  //check for validation
+  const validation = schema.validate(user);
+  if(validation.error){
+    return res.status(401).send(validation)
+  }
+  const newUser = new User(user);
+  //check if user exists 
+  await User.find()
+    .then(async (users)=>{
+      users.filter(user=>{
+        if(user.email == user.email){
+          const err = new Error("email already exists");
+          return res.status(401).send(err)
+        }
+      })
+      //if doesnt exist we save
+      await newUser.save((err) => {
+        if (err) {
+          return res.status(400).send(err);
+        }
+      });
+      return res.send("User saved");
+    })
 });
 
 //delete one

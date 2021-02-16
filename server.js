@@ -4,6 +4,8 @@ const express = require("express");
 const app = express();
 const ProjectRoutes = require("./Routes/ProjectRoutes");
 const FeatureRoutes = require("./Routes/FeatureRoutes");
+const TaskRoutes = require("./Routes/TaskRoutes");
+const UserRoutes = require("./Routes/UserRoutes");
 const bodyParser = require("body-parser");
 
 //DB instance
@@ -19,7 +21,9 @@ const db = mongoose.connection;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/project", ProjectRoutes);
-app.use("/feature/",FeatureRoutes);
+app.use("/feature/", FeatureRoutes);
+app.use("/task", TaskRoutes);
+app.use("/user", UserRoutes);
 
 //homepage
 app.get("/", (req, res) => {

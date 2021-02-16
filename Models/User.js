@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const validoator = require("validator")
+const vdt = require("validator");
 
 const schema = new mongoose.Schema({
   name: {
@@ -8,22 +8,25 @@ const schema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required:true,
-    min:8
+    required: true,
+    min: 8,
   },
-  email : {
+  //double validation just in case but not working for now oop
+  email: {
     type: String,
-    validate:{
-      validator:validoator.IsEmail,
+    validate: {
+      validator: (v)=>{
+        vdt.isEmail(v)
+      },
       message: "not a valid email",
-      isAsync:false
+      isAsync: false,
     },
-    unique:true,
-    required:true
+    unique: true,
+    required: true,
   },
   role: {
     enum: ["Dev", "Admin", "Tester", "Manager"],
-    default: "Dev",
+    default: "Admin", // change this later after testing
     type: String,
   },
   projects: [
@@ -31,7 +34,7 @@ const schema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
     },
-  ]
+  ],
 });
 
 const User = mongoose.model("User", schema);

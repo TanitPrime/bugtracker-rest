@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
 
   await newproject.save((err) => {
     if (err) {
-      return res.status(400).send("bad request or invalid data \n" + err);
+      return res.send("bad request or invalid data \n" + err);
     }
   });
   return res.send("project saved");

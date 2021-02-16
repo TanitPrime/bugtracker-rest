@@ -25,12 +25,12 @@ router.get("/:id", async (req, response) => {
   //   return response.status(200).send(res);
   // });
   Feature.findById(req.params.id)
-  //fill tasks reference with actual tasks
-  .populate("tasks")
-  .exec((err, result) => {
-    if (err) return res.status(404).send(err);
-    return res.status(200).send(result);
-  });
+    //fill tasks reference with actual tasks
+    .populate("tasks")
+    .exec((err, result) => {
+      if (err) return res.status(404).send(err);
+      return res.status(200).send(result);
+    });
 });
 
 //create
