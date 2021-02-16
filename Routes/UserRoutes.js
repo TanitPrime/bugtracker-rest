@@ -1,8 +1,9 @@
-//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ needs testing + password safety + adding projects ??? $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  password safety + add project route $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
 const Joi = require("joi");
+const bcrypt = require("bcryptjs");
 
 //validation schema
 const schema = Joi.object({
@@ -11,7 +12,6 @@ const schema = Joi.object({
   password : Joi.string().min(8).required(),
   role : Joi.string().valid("Dev","Tester","Manager","Admin")
 })
-
 
 //User Routes
 //get all
@@ -40,10 +40,12 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const user = {
     name: req.body.name,
     email: req.body.email,
-    password: req.body.password, // PLACEHOLDER !!!!!!!!
+    password: hashedPassword,
     role: req.body.role,
   };
   //check for validation
