@@ -58,6 +58,11 @@ router.post("/", async (req, response) => {
 
 //delete one
 router.delete("/:id", async (req, response) => {
+  //remove reference
+  await Feature.update({},{
+    $pull : {features : req.params.id}
+  });
+  //remove document
   await Task.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {
       return response.status(404).send(err);

@@ -6,6 +6,7 @@ const ProjectRoutes = require("./Routes/ProjectRoutes");
 const FeatureRoutes = require("./Routes/FeatureRoutes");
 const TaskRoutes = require("./Routes/TaskRoutes");
 const UserRoutes = require("./Routes/UserRoutes");
+const Auth = require("./Routes/Auth");
 const bodyParser = require("body-parser");
 
 //DB instance
@@ -24,6 +25,7 @@ app.use("/project", ProjectRoutes);
 app.use("/feature/", FeatureRoutes);
 app.use("/task", TaskRoutes);
 app.use("/user", UserRoutes);
+app.use("/", Auth);
 
 //homepage
 app.get("/", (req, res) => {
