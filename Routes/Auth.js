@@ -6,18 +6,28 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken")
 
 router.post("/login", async (req, res) => {
+  //get input
   const credentials = { email: req.body.email, password: req.body.password };
+
+  //attempt to find corresponding user
   await User.findOne({ email: credentials.email }, (err, doc) => {
     if (err || !doc) return res.send("password or email dont match");
+    //if found we compare posswords
     bcrypt.compare(credentials.password, doc.password, (err, result) => {
       if (err) return res.send(err);
       if (result) {
-        //create JWT todo
+        //sign JWT if everything matches 
         const accessToken = jwt.sign(
             { id: doc._id, role: doc.role },
             `${process.env.JWT_SECRET_KEY}`
           );
-          res.json({ accessToken });
+          //send
+          res.cookie("AuthCookie",accessToken,{
+            expires: new Date(Date.now()+ 900000),
+            httpOnly : true,
+            signed : true
+          })
+          res.send(`welcome ${doc.name}`);
       } else {
         return res.send("password or email dont match");
       }

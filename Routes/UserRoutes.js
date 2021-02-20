@@ -1,9 +1,10 @@
-//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  password safety + add project route $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  add project route $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
+const isLoggedIn = require("../AuthCheck")
 
 //validation schema
 const schema = Joi.object({
@@ -20,7 +21,7 @@ const schema = Joi.object({
 
 //User Routes
 //get all
-router.get("/", async (req, res) => {
+router.get("/", isLoggedIn,async (req, res) => {
   try {
     await User.find().then((data) => {
       return res.send(data);

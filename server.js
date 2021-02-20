@@ -8,6 +8,7 @@ const TaskRoutes = require("./Routes/TaskRoutes");
 const UserRoutes = require("./Routes/UserRoutes");
 const Auth = require("./Routes/Auth");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser")
 
 //DB instance
 mongoose.connect("mongodb://localhost/mern", {
@@ -19,8 +20,11 @@ mongoose.connect("mongodb://localhost/mern", {
 const db = mongoose.connection;
 
 //Middleware
+app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//Routes
 app.use("/project", ProjectRoutes);
 app.use("/feature/", FeatureRoutes);
 app.use("/task", TaskRoutes);
