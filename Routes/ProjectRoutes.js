@@ -17,10 +17,11 @@ router.get("/", async (req, res) => {
 
 //get one
 router.get("/:id", async (req, res) => {
-  //populate features before sending for ease of access
+  //populate Bugs before sending for ease of access
   Project.findById(req.params.id)
-    //fill feature reference with actual features
-    .populate("features")
+    //fill Bug reference with actual Bugs
+    .populate("bugs")
+    .populate("users")
     .exec((err, result) => {
       if (err) return res.status(404).send(err);
       return res.status(200).send(result);

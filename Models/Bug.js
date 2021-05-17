@@ -4,7 +4,7 @@ const schema = new mongoose.Schema({
   name: {
     type: String,
     min: 6,
-    required:true
+    required: true,
   },
   priority: {
     type: Number,
@@ -16,13 +16,7 @@ const schema = new mongoose.Schema({
     default: "todo",
     type: String,
   },
-  tasks: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Task",
-    },
-  ]
 });
 
-const Feature = mongoose.model("Feature", schema);
-module.exports = Feature;
+const Bug = mongoose.model("Bug", schema);
+module.exports = Bug;

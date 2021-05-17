@@ -3,8 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const ProjectRoutes = require("./Routes/ProjectRoutes");
-const FeatureRoutes = require("./Routes/FeatureRoutes");
-const TaskRoutes = require("./Routes/TaskRoutes");
+const BugRoutes = require("./Routes/BugRoutes");
 const UserRoutes = require("./Routes/UserRoutes");
 const Auth = require("./Routes/Auth");
 const bodyParser = require("body-parser");
@@ -26,8 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Routes
 app.use("/project", ProjectRoutes);
-app.use("/feature/", FeatureRoutes);
-app.use("/task", TaskRoutes);
+app.use("/Bug/", BugRoutes);
 app.use("/user", UserRoutes);
 app.use("/", Auth);
 
