@@ -16,6 +16,10 @@ const schema = new mongoose.Schema({
     default: "todo",
     type: String,
   },
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "project",
+  },
 });
 
 const Bug = mongoose.model("Bug", schema);

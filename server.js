@@ -5,9 +5,10 @@ const app = express();
 const ProjectRoutes = require("./Routes/ProjectRoutes");
 const BugRoutes = require("./Routes/BugRoutes");
 const UserRoutes = require("./Routes/UserRoutes");
+const HomePage = require("./Routes/Homepage");
 const Auth = require("./Routes/Auth");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 
 //DB instance
 mongoose.connect("mongodb://localhost/mern", {
@@ -25,13 +26,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Routes
 app.use("/project", ProjectRoutes);
-app.use("/Bug/", BugRoutes);
+app.use("/bug", BugRoutes);
 app.use("/user", UserRoutes);
-app.use("/", Auth);
+app.use("/auth", Auth);
+app.use("/homepage", HomePage);
 
-//homepage
-app.get("/", (req, res) => {
-  res.send("welcome to homepage");
+//default function for unexpected routes
+app.get("*",(req, res)=>{
+  console.log("hi")
+  res.status(404).send("what???");
 });
 
 //Server running after db connection

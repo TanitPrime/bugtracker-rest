@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const Project = require("../Models/Project");
 
@@ -17,15 +18,19 @@ router.get("/", async (req, res) => {
 
 //get one
 router.get("/:id", async (req, res) => {
-  //populate Bugs before sending for ease of access
-  Project.findById(req.params.id)
-    //fill Bug reference with actual Bugs
-    .populate("bugs")
-    .populate("users")
-    .exec((err, result) => {
-      if (err) return res.status(404).send(err);
-      return res.status(200).send(result);
-    });
+  const isValid = mongoose.Types.ObjectId.isValid(req.params.id);
+  if (isValid) {
+    //populate Bugs before sending for ease of access
+    Project.findById(req.params.id)
+      //fill Bug reference with actual Bugs
+      .populate("bugs")
+      .populate("users")
+      .exec((err, result) => {
+        if (err) return res.status(404).send(err);
+        return res.status(200).send(result);
+      });
+  }
+  return res.sendStatus(404);
 });
 
 //create
