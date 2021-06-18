@@ -16,6 +16,13 @@ const schema = new mongoose.Schema({
     default: "todo",
     type: String,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  lastUpdated:{
+    type:Date
+  },
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "project",
