@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const isLoggedIn = require("../AuthCheck");
+const {isLoggedIn} = require("../MiddlewareHelpers");
 const JWT = require("jsonwebtoken");
 
 //this route should fire upon signing in in order to prepare the home page in front-end

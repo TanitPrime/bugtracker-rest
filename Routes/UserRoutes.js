@@ -4,7 +4,7 @@ const router = express.Router();
 const User = require("../Models/User");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
-const isLoggedIn = require("../AuthCheck")
+const {isLoggedIn} = require("../MiddlewareHelpers")
 
 //validation schema
 const schema = Joi.object({
