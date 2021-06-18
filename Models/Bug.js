@@ -23,10 +23,10 @@ const schema = new mongoose.Schema({
   lastUpdated:{
     type:Date
   },
-  projectId: {
+  author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "project",
-  },
+    ref: "User"
+  }
 });
 
 const Bug = mongoose.model("Bug", schema);
