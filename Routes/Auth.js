@@ -11,7 +11,7 @@ router.post("/login", async (req, res) => {
 
   //attempt to find corresponding user
   await User.findOne({ email: credentials.email }, (err, doc) => {
-    if (err || !doc) return res.send("password or email dont match");
+    if (err || !doc) return res.send(JSON.stringify({msg:`password or email mismatch`,success:false}));
     //if found we compare posswords
     bcrypt.compare(credentials.password, doc.password, (err, result) => {
       if (err) return res.send(err);
@@ -21,15 +21,17 @@ router.post("/login", async (req, res) => {
             { id: doc._id, role: doc.role },
             `${process.env.JWT_SECRET_KEY}`
           );
+          console.log(accessToken)
           //send
           res.cookie("AuthCookie",accessToken,{
             expires: new Date(Date.now()+ 900000),
-            httpOnly : true,
+            httpOnly : false,
             signed : true
           })
-          res.send(`welcome ${doc.name}`);
+          res.cookie("role",doc.role)
+          res.send(JSON.stringify({msg:`welcome ${doc.name}`,success:true}));
       } else {
-        return res.send("password or email dont match");
+        return res.send(JSON.stringify({msg:`password or email mismatch`,success:false}));
       }
     });
   });
@@ -45,7 +47,7 @@ const schema = Joi.object({
     }),
   email: Joi.string().min(6).required().email(),
   password: Joi.string().min(8).required(),
-  role: Joi.string().valid("Dev", "Tester", "Manager", "Admin"),
+  role: Joi.string().valid("Admin","Member"),
 });
 
 //create

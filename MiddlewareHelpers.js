@@ -5,8 +5,9 @@ const JWT = require("jsonwebtoken");
 const isLoggedIn = (req, res, next) => {
   //get token from signed cookies
   let token = req.signedCookies.AuthCookie;
+  console.log(token)
   try{
-    if (!token) return res.status(403).send("you are not logged in. Please login to continue");
+    if (!token) return res.status(403).send(JSON.stringify({msg:`you are not logged in`,type:"error"}));
     //verify token
     JWT.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
       if (err) {

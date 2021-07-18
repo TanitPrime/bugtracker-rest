@@ -22,6 +22,7 @@ const schema = Joi.object({
 //User Routes
 //get all
 router.get("/", isLoggedIn,async (req, res) => {
+
   try {
     await User.find().then((data) => {
       return res.send(data);
