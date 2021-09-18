@@ -3,8 +3,11 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../Models/User");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const { isLoggedIn } = require("../MiddlewareHelpers");
 
+
+//login
 router.post("/login", async (req, res) => {
   //get input
   const credentials = { email: req.body.email, password: req.body.password };
@@ -37,6 +40,20 @@ router.post("/login", async (req, res) => {
   });
 });
 
+//logout
+router.get("/logout",isLoggedIn,(req,res)=>{
+  res.cookie("AuthCookie", {
+    expires: "Thu, 01 Jan 1970 00:00:01 GMT;",
+    httpOnly: false, //change this later
+    signed:true
+  });
+  res.cookie("role", {
+    expires: "Thu, 01 Jan 1970 00:00:03 GMT;",
+    httpOnly: false,
+    signed:false
+  });
+  res.send(JSON.stringify({msg:"you have been logged out"}))
+})
 //validation schema
 const schema = Joi.object({
   name: Joi.string()
