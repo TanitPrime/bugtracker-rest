@@ -1,4 +1,5 @@
 const express = require("express");
+const res = require("express/lib/response");
 const router = express.Router();
 const Bug = require("../Models/Bug");
 const Project = require("../Models/Project");
@@ -42,32 +43,30 @@ router.post("/", async (req, response) => {
     priority: req.body.priority,
     status: req.body.status,
   };
+  const filter = req.body.projectId;
   const newBug = new Bug(bug);
   // save Bug
-  await newBug.save((err, result) => {
-    if (err) {
-      return res.status(400).send(err);
-    }
-    //add reference in Project.Bugs
-    Project.findByIdAndUpdate(
-      req.body.projectId,
-      {
-        $push: { Bugs: result._id },
-      },
-      (err, res) => {
-        if (err) response.status(400).send(err);
-        return response.status(200).send(result);
+  try{
+    let doc = await newBug.save()
+    await Project.findByIdAndUpdate(
+      filter,{
+        $push:{bugs: doc._id}
       }
-    );
-  });
+    )
+    return response.status(200).send(doc)
+  }catch(err){return response.status(500).send(err)}
+
 });
 
 //delete one
 router.delete("/:id", async (req, response) => {
   //remove reference
-  await Project.update({},{
-    $pull : {Bugs : req.params.id}
-  });
+  await Project.update(
+    {},
+    {
+      $pull: { Bugs: req.params.id },
+    }
+  );
   //then remove document
   await Bug.findByIdAndDelete(req.params.id, (err, res) => {
     if (err) {

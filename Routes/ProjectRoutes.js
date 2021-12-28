@@ -38,6 +38,7 @@ router.get("/:id", isLoggedIn, async (req, res) => {
 });
 
 //create
+//change this so adding users is standalone
 router.post("/", isLoggedIn, async (req, res) => {
   const newproject = {
     name: req.body.name,
@@ -47,10 +48,8 @@ router.post("/", isLoggedIn, async (req, res) => {
     const project = new Project(newproject);
     //add users if sent
     if (req.body.users) {
-      console.log(req.body.users)
       //get list of all user ids
       const userIds = await User.find({}, "_id").exec();
-      console.log("userIds:"+userIds)
       //check for intersection
       //general function
       const operation = (list1, list2, isUnion = false) =>
