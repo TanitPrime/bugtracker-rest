@@ -18,13 +18,20 @@ router.get("/", async (req, res) => {
 });
 
 //get one
-router.get("/:id", async (req, response) => {
-  await Bug.findById(req.params.id, (err, res) => {
-    if (err || !res) {
-      return response.status(404).send("no data found" + err);
-    }
-    return response.status(200).send(res);
-  });
+router.get("/:id", async (req, res) => {
+  try {
+    let doc = await Bug.findById(req.params.id);
+    return res.status(200).send(doc);
+  } catch (err) {
+    return res.status(404).send("no data found" + err);
+  }
+
+  // await Bug.findById(req.params.id, (err, res) => {
+  //   if (err || !res) {
+  //     return response.status(404).send("no data found" + err);
+  //   }
+  //   return response.status(200).send(res);
+  // });
   // Bug.findById(req.params.id)
   //   //fill tasks reference with actual tasks
   //   .populate("tasks")
@@ -46,52 +53,76 @@ router.post("/", async (req, response) => {
   const filter = req.body.projectId;
   const newBug = new Bug(bug);
   // save Bug
-  try{
-    let doc = await newBug.save()
-    await Project.findByIdAndUpdate(
-      filter,{
-        $push:{bugs: doc._id}
-      }
-    )
-    return response.status(200).send(doc)
-  }catch(err){return response.status(500).send(err)}
-
+  try {
+    let doc = await newBug.save();
+    await Project.findByIdAndUpdate(filter, {
+      $push: { bugs: doc._id },
+    });
+    return response.status(200).send(doc);
+  } catch (err) {
+    return response.status(500).send(err);
+  }
 });
 
 //delete one
-router.delete("/:id", async (req, response) => {
+router.delete("/:id", async (req, res) => {
   //remove reference
-  await Project.update(
-    {},
-    {
-      $pull: { Bugs: req.params.id },
-    }
-  );
-  //then remove document
-  await Bug.findByIdAndDelete(req.params.id, (err, res) => {
-    if (err) {
-      return response.status(404).send(err);
-    }
-    return response.status(200).send("document deleted" + res);
-  });
+  try{
+    let doc = await Bug.findByIdAndDelete(req.params.id);
+    //delete refence in project
+    let doc2 = await Project.update(
+      {},
+      {
+        $pull: { Bugs: req.params.id },
+      }
+    );
+    return res.status(200).send("document deleted" + doc + doc2);
+  }catch(err){
+    return res.status(404).send(err);
+  }
+  // await Project.update(
+  //   {},
+  //   {
+  //     $pull: { Bugs: req.params.id },
+  //   }
+  // );
+  // //then remove document
+  // await Bug.findByIdAndDelete(req.params.id, (err, res) => {
+  //   if (err) {
+  //     return response.status(404).send(err);
+  //   }
+  //   return response.status(200).send("document deleted" + res);
+  // });
 });
 
 //update
 router.put("/:id", async (req, response) => {
-  await Bug.findByIdAndUpdate(
-    req.params.id,
-    {
-      name: req.body.name,
-      priority: req.body.priority,
-      status: req.body.status,
-    },
-    (err, res) => {
-      if (err) {
-        return response.status(404).send(err);
-      }
-      return response.status(200).send("document updated");
-    }
-  );
+  try{
+    let doc = await Bug.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+        priority: req.body.priority,
+        status: req.body.status,
+      })
+      return response.status(200).send("document updated "+doc);
+  }catch(err){
+    return response.status(404).send(err);
+  }
+  // await Bug.findByIdAndUpdate(
+  //   req.params.id,
+  //   {
+  //     name: req.body.name,
+  //     priority: req.body.priority,
+  //     status: req.body.status,
+  //   },
+  //   (err, res) => {
+  //     if (err) {
+  //       return response.status(404).send(err);
+  //     }
+  //     return response.status(200).send("document updated");
+  //   }
+  // );
 });
 
 module.exports = router;
