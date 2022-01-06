@@ -7,7 +7,7 @@ const User = require("../Models/User");
 
 //Project Routes
 //get all
-router.get("/",isLoggedIn, async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
   console.log(req.currentUser);
   try {
     await Project.find().then((data) => {
@@ -37,8 +37,6 @@ router.get("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-//create
-//change this so adding users is standalone
 router.post("/", isLoggedIn, async (req, res) => {
   const newproject = {
     name: req.body.name,
@@ -46,35 +44,6 @@ router.post("/", isLoggedIn, async (req, res) => {
   };
   try {
     const project = new Project(newproject);
-    //add users if sent
-    if (req.body.users) {
-      //get list of all user ids
-      const userIds = await User.find({}, "_id").exec();
-      //check for intersection
-      //general function
-      const operation = (list1, list2, isUnion = false) =>
-        list1.filter(
-          (
-            (set) => (a) =>
-              isUnion === set.has(a._id)
-          )(new Set(list2.map((b) => b._id)))
-        );
-      //intersection function
-      const inBoth = (list1, list2) => operation(list1, list2, true);
-      const intersection = inBoth(userIds,req.body.users)
-      console.log(intersection)
-      //if ids are included in db then save to project
-      if (intersection.length === req.body.users.length) {
-        req.body.users.forEach((element) => {
-          project.users.push(element);
-        });
-      } else {
-        //else we tell user ids are invalid
-        return res
-          .status(400)
-          .send("the ids submitted are invalid please try again");
-      }
-    }
     const result = await project.save();
     if (result === null) {
       return res.send("bad request or invalid data \n" + err);
@@ -86,6 +55,44 @@ router.post("/", isLoggedIn, async (req, res) => {
   }
 });
 
+//this works with one or more users
+//reason is i want the project admin to be able to add users from a checkbox list
+router.post("/adduser/:id", isLoggedIn, async (req, res) => {
+  try {
+    //grab the corresponding project
+    const project = await Project.findById(req.params.id);
+    //add users if sent
+    const users = [];
+    req.body.users.forEach((element) => {
+      users.push(element);
+    });
+
+    if (users) {
+      //get list of all user ids
+      const userIds = await User.find({}, "_id");
+      //console.log(users);
+      //console.log(userIds)
+      //check for intersection
+      const intersection = req.body.users.filter((item1) =>
+        userIds.some((item2) => item1._id.toString() === item2._id.toString())
+      );
+      //console.log(intersection);
+      //add users to project
+      intersection.forEach((element) => {
+        //add valid userIds to project
+        if (mongoose.Types.ObjectId.isValid(element._id))
+          project.users.push(element);
+      });
+      const result = await project.save();
+      if (result === null) {
+        return res.send("bad request or invalid data \n" + err);
+      }
+      return res.send(result);
+    }
+  } catch (err) {
+    return res.status(500).send("something went wrong \n" + err);
+  }
+});
 //delete one
 router.delete("/:id", isLoggedIn, async (req, res) => {
   try {

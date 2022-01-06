@@ -1,10 +1,9 @@
-//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  add project route $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/User");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
-const {isLoggedIn} = require("../MiddlewareHelpers")
+const { isLoggedIn } = require("../MiddlewareHelpers");
 
 //validation schema
 const schema = Joi.object({
@@ -21,8 +20,7 @@ const schema = Joi.object({
 
 //User Routes
 //get all
-router.get("/", isLoggedIn,async (req, res) => {
-
+router.get("/", isLoggedIn, async (req, res) => {
   try {
     await User.find().then((data) => {
       return res.send(data);
@@ -36,15 +34,23 @@ router.get("/", isLoggedIn,async (req, res) => {
 //get one
 router.get("/:id", async (req, res) => {
   //populate projects before sending for ease of access
-  User.findById(req.params.id)
-    //fill projects reference with actual projects
-    .populate("projects")
-    .exec((err, result) => {
-      if (err) return res.status(404).send(err);
-      return res.status(200).send(result);
-    });
+  try {
+    let doc = await User.findById(req.params.id);
+    await doc.populate("projects");
+    console.log(doc)
+    return res.status(200).send(doc);
+  } catch (err) {
+    console.log(err.reason)
+    return res.status(404).send(err);
+  }
+  // User.findById(req.params.id)
+  //   //fill projects reference with actual projects
+  //   .populate("projects")
+  //   .exec((err, result) => {
+  //     if (err) return res.status(404).send(err);
+  //     return res.status(200).send(result);
+  //   });
 });
-
 
 //delete one
 router.delete("/:id", async (req, response) => {

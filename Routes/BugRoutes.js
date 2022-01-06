@@ -1,12 +1,13 @@
 const express = require("express");
 const res = require("express/lib/response");
+const { isLoggedIn } = require("../MiddlewareHelpers");
 const router = express.Router();
 const Bug = require("../Models/Bug");
 const Project = require("../Models/Project");
 
 //Bug Routes
 //get all
-router.get("/", async (req, res) => {
+router.get("/",isLoggedIn, async (req, res) => {
   try {
     await Bug.find().then((data) => {
       return res.status(200).send(data);
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 //get one
-router.get("/:id", async (req, res) => {
+router.get("/:id",isLoggedIn, async (req, res) => {
   try {
     let doc = await Bug.findById(req.params.id);
     return res.status(200).send(doc);
@@ -43,7 +44,7 @@ router.get("/:id", async (req, res) => {
 
 //create
 //requires Project Id
-router.post("/", async (req, response) => {
+router.post("/",isLoggedIn, async (req, response) => {
   //new Bug from request
   const bug = {
     name: req.body.name,
@@ -65,10 +66,13 @@ router.post("/", async (req, response) => {
 });
 
 //delete one
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",isLoggedIn, async (req, res) => {
   //remove reference
   try{
     let doc = await Bug.findByIdAndDelete(req.params.id);
+    if (doc === null) {
+      return res.status(404).send(err);
+    }
     //delete refence in project
     let doc2 = await Project.update(
       {},
@@ -76,6 +80,9 @@ router.delete("/:id", async (req, res) => {
         $pull: { Bugs: req.params.id },
       }
     );
+    if (doc2 === null) {
+      return res.status(404).send(err);
+    }
     return res.status(200).send("document deleted" + doc + doc2);
   }catch(err){
     return res.status(404).send(err);
@@ -96,7 +103,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 //update
-router.put("/:id", async (req, response) => {
+router.put("/:id",isLoggedIn, async (req, res) => {
   try{
     let doc = await Bug.findByIdAndUpdate(
       req.params.id,
@@ -105,9 +112,12 @@ router.put("/:id", async (req, response) => {
         priority: req.body.priority,
         status: req.body.status,
       })
-      return response.status(200).send("document updated "+doc);
+      if (doc === null) {
+        return res.status(404).send(err);
+      }
+      return res.status(200).send("document updated "+doc);
   }catch(err){
-    return response.status(404).send(err);
+    return res.status(404).send(err);
   }
   // await Bug.findByIdAndUpdate(
   //   req.params.id,
