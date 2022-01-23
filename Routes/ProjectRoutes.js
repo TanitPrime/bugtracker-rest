@@ -10,9 +10,12 @@ const User = require("../Models/User");
 router.get("/", isLoggedIn, async (req, res) => {
   console.log(req.currentUser);
   try {
-    await Project.find().then((data) => {
-      return res.send(data);
-    });
+    const result = await Project.find()
+    .populate("bugs")
+    .populate("users")
+    .exec()
+    if (result === null) return res.status(404).send(err);
+      return res.status(200).send(result);
   } catch (err) {
     return res.status(404).send("no data or bad request \n" + err);
   }
@@ -63,7 +66,8 @@ router.post("/adduser/:id", isLoggedIn, async (req, res) => {
     const project = await Project.findById(req.params.id);
     //add users if sent
     const users = [];
-    req.body.users.forEach((element) => {
+    let uniqueUsers = [...new Set(req.body.users)]
+    uniqueUsers.forEach((element) => {
       users.push(element);
     });
 
@@ -80,8 +84,18 @@ router.post("/adduser/:id", isLoggedIn, async (req, res) => {
       //add users to project
       intersection.forEach((element) => {
         //add valid userIds to project
-        if (mongoose.Types.ObjectId.isValid(element._id))
-          project.users.push(element);
+        if (mongoose.Types.ObjectId.isValid(element._id)){
+
+          const exists = project.users.includes(element._id)
+          console.log(exists)
+          
+          if(!exists){
+            project.users.push(element);
+          }
+          else{
+            return res.send("Already exists \n" + err);
+          }
+        }
       });
       const result = await project.save();
       if (result === null) {
