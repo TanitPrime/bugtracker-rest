@@ -13,6 +13,7 @@ const isLoggedIn = (req, res, next) => {
         return res.status(500).send("something went wrong"+ err);
       }
       req.currentUser = decoded;
+      console.log(req.currentUser)
     });
     next();
   }catch(err){

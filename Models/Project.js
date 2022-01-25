@@ -7,6 +7,9 @@ const schema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  author:{
+    type: mongoose.Schema.Types.ObjectId,
+  },
   status: {
     enum: ["todo", "done", "doing"],
     type: String,

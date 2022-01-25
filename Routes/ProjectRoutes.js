@@ -44,7 +44,9 @@ router.post("/", isLoggedIn, async (req, res) => {
   const newproject = {
     name: req.body.name,
     status: req.body.status,
+    author: req.currentUser.id
   };
+  console.log(newproject.author)
   try {
     const project = new Project(newproject);
     const result = await project.save();

@@ -31,6 +31,7 @@ router.post("/login", async (req, res) => {
             httpOnly : false,
             signed : true
           })
+          res.cookie("id",doc._id.toString())
           res.cookie("role",doc.role)
           res.send(JSON.stringify({msg:`welcome ${doc.name}`,success:true}));
       } else {
